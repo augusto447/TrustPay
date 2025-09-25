@@ -59,6 +59,7 @@ export function DashboardContextProvider({
       valor: 2000,
       tipo: "entrada",
       data: format(new Date(), "dd/MM/yyyy HH:mm"),
+      
     },
     {
       id: 2,
@@ -81,6 +82,49 @@ export function DashboardContextProvider({
       tipo: "entrada",
       data: format(new Date(), "dd/MM/yyyy HH:mm"),
     },
+    {
+      id: 4,
+      descricao: "Venda de produto",
+      valor: 500,
+      tipo: "entrada",
+      data: format(new Date(), "dd/MM/yyyy HH:mm"),
+    },
+    {
+      id: 4,
+      descricao: "Venda de produto",
+      valor: 500,
+      tipo: "entrada",
+      data: format(new Date(), "dd/MM/yyyy HH:mm"),
+    },
+    {
+      id: 4,
+      descricao: "Venda de produto",
+      valor: 500,
+      tipo: "entrada",
+      data: format(new Date(), "dd/MM/yyyy HH:mm"),
+    },
+    {
+      id: 4,
+      descricao: "Venda de produto",
+      valor: 500,
+      tipo: "entrada",
+      data: format(new Date(), "dd/MM/yyyy HH:mm"),
+    },
+    {
+      id: 4,
+      descricao: "Venda de produto",
+      valor: 500,
+      tipo: "entrada",
+      data: format(new Date(), "dd/MM/yyyy HH:mm"),
+    },
+    {
+      id: 4,
+      descricao: "Venda de produto",
+      valor: 500,
+      tipo: "entrada",
+      data: format(new Date(), "dd/MM/yyyy HH:mm"),
+    },
+  
   ];
 
   return (

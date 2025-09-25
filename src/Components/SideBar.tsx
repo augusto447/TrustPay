@@ -33,11 +33,11 @@ export function SideBar() {
           <span>Configurações</span>{" "}
         </NavLink>
         <NavLink
-          to="/cadastrar"
+          to="/registrar-transacao"
           className="flex items-center gap-2 mb-4  hover:text-gray-300 cursor-pointer"
         >
-          <PlusCircle size={24  } />
-          <span >Cadastrar </span>
+          <PlusCircle size={24} />
+          <span> Transação </span>
         </NavLink>
         <NavLink
           to="/"

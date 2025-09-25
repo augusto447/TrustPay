@@ -15,7 +15,7 @@ export function Router() {
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="historico" element={<Historico />} />
         <Route path="configuracao" element={<Configurations />} />
-        <Route path="cadastrar" element={<Cadastrar/>} />
+        <Route path="registrar-transacao" element={<Cadastrar/>} />
       </Route>
     </Routes>
   );
