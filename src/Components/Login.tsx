@@ -18,7 +18,7 @@ export function Login() {
         <label htmlFor="nome">Nome</label>
         <input
           id="nome"
-          type="nome"
+          type="text"
           placeholder="Digita o seu nome"
           className="p-2 w-full md:w-80  border border-gray-300 rounded-lg    focus:outline-none focus:ring-2 focus:ring-blue-400"
         />

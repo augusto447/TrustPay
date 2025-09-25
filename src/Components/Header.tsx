@@ -3,7 +3,7 @@ import { Bell } from "phosphor-react";
 import avatar from "../assets/profile.jpg";
 export function Header() {
   return (
-    <nav className="flex items-center justify-between p-4   ">
+    <nav className="flex items-center justify-between p-4  shadow ">
       <div className="flex items-center gap-1">
         <img className="h-10" src={logo} alt="" />
         <span>TrustPay</span>

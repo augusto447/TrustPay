@@ -4,12 +4,12 @@ import { SideBar } from "../Components/SideBar";
 
 export function DefaultLayout() {
   return (
-    <div >
+    <div>
       <Header />
       <div className="flex gap-4 p-4 min-h-screen">
         <SideBar />
 
-        <main>
+        <main className="bg-gray-300 w-screen">
           <Outlet />
         </main>
       </div>
