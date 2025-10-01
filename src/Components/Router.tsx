@@ -15,7 +15,7 @@ export function Router() {
     <Routes>
       <Route path="/" element={<Signup />} />
       <Route path="login" element={<Login />} />
-      <Route path="/" element={<DefaultLayout />}>
+      <Route element={<DefaultLayout />}>
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="historico" element={<Historico />} />
         <Route path="configuracao" element={<Configurations />} />
