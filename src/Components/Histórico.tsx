@@ -7,7 +7,7 @@ export function Historico() {
 
   return (
     <div className="p-10 rounded-2xl  shadow bg-white mt-10 ml-10 mr-10">
-      <h2 className="text-2xl text-center font-bold mb-4">Histórico de Transações</h2>
+      <h2 className="text-2xl black text-center font-bold mb-4">Histórico de Transações</h2>
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left border-collapse border">
@@ -21,7 +21,7 @@ export function Historico() {
           </thead>
           <tbody>
             {historico.map((item) => (
-              <tr key={item.id} className="border-b border hover:bg-gray-50">
+              <tr key={item.id} className="border hover:bg-gray-50">
                 <td className="py-2 px-4 border">{item.descricao}
                
                 </td>

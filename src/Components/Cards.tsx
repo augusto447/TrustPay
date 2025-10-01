@@ -18,5 +18,8 @@ export function Cards({ title, value, icon }: CardsProps) {
       </div>
       <p className="text-2xl font-bold text-gray-800 text-center ">{value}</p>
     </div>
+    
+    
   );
 }
+ 

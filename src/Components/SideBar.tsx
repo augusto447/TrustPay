@@ -6,8 +6,18 @@ import {
   SignOut,
 } from "phosphor-react";
 import { NavLink } from "react-router-dom";
+import { useContext } from "react";
+import { DashboardContext } from "../Contexts/DashboardContext";
+import { useNavigate } from "react-router-dom";
 
 export function SideBar() {
+  const { logout } = useContext(DashboardContext);
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    logout();
+    navigate("/login");
+  }
   return (
     <aside className="p-7 bg-gray-800 text-white w-60 shadom ">
       <ul className="flex flex-col gap-6">
@@ -39,13 +49,13 @@ export function SideBar() {
           <PlusCircle size={24} />
           <span> Transação </span>
         </NavLink>
-        <NavLink
-          to="/"
+        <button
+          onClick={handleLogout}
           className="flex items-center gap-2 mb-4 hover:text-gray-300 cursor-pointer"
         >
           <SignOut size={24} />
           <span>Log out</span>
-        </NavLink>
+        </button>
       </ul>
     </aside>
   );
