@@ -86,7 +86,7 @@ export function Signup() {
     <div className="text-1xl flex-col  md:flex-row   flex items-center  justify-center gap-16 h-screen w-full bg-gray-100">
       <form
         onSubmit={handleSubmit(handleSignup)}
-        className="flex flex-col justify-center p-8 gap-0.5    "
+        className="flex flex-col justify-center p-8 gap-1  gap-2  "
       >
         <div className="flex items-center justify-center gap-2">
           <img className="h-14" src={logo} alt="" />

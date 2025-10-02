@@ -44,7 +44,6 @@ export function Login() {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-    
 
       const userData = {
         name: user.displayName || "Usuário Google",
