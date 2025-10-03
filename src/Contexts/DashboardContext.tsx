@@ -1,11 +1,10 @@
+// src/Contexts/DashboardContext.tsx
 import { createContext, useEffect, useState, type ReactNode } from "react";
-import type { CardsProps } from "../Components/Cards";
-import { ChartLine, CurrencyDollar } from "phosphor-react";
-import { format } from "date-fns";
 
 interface DasboardContextProviderProps {
   children: ReactNode;
 }
+
 interface User {
   name: string;
   email: string;
@@ -13,17 +12,7 @@ interface User {
   avatar: string;
 }
 
-interface DasboardContextTypes {
-  cards: CardsProps[];
-  historico: HistoricoTypes[];
-  user: User | null;
-  signup: (nome: string, email: string, password: string) => boolean;
-  login: (email: string, password: string) => boolean;
-  logout: () => void;
-  setUser: (user: User | null) => void; // 👈
-}
-
-interface HistoricoTypes {
+interface Transacao {
   id: number;
   descricao: string;
   valor: number;
@@ -31,168 +20,167 @@ interface HistoricoTypes {
   data: string;
 }
 
+interface Notificacao {
+  id: number;
+  mensagem: string;
+  tipo: "entrada" | "saida";
+}
+
+interface DasboardContextTypes {
+  user: User | null;
+  signup: (nome: string, email: string, password: string) => boolean;
+  login: (email: string, password: string) => boolean;
+  logout: () => void;
+  setUser: (user: User | null) => void;
+  transacoes: Transacao[];
+  saldo: number;
+  receitas: number;
+  despesas: number;
+  adicionarTransacao: (transacao: Omit<Transacao, "id" | "data">) => void;
+  removerTransacao: (id: number) => void;
+
+  notificacao: string | null; // 👈 nova
+  setNotificacao: (msg: string | null) => void;
+  notificacoes: Notificacao[];
+  adicionarNotificacao: (mensagem: string, tipo: "entrada" | "saida") => void;
+  removerNotificacao: (id: number) => void;
+}
+
 export const DashboardContext = createContext({} as DasboardContextTypes);
 
 export function DashboardContextProvider({
   children,
 }: DasboardContextProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
+  // Inicializa estados direto do localStorage
+  const [user, setUser] = useState<User | null>(() => {
     const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-  }, []);
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
+  const [notificacoes, setNotificacoes] = useState<Notificacao[]>([]);
+
+  function adicionarNotificacao(mensagem: string, tipo: "entrada" | "saida") {
+    const novaNotificacao = {
+      id: Date.now(),
+      mensagem,
+      tipo,
+    };
+    setNotificacoes([novaNotificacao, ...notificacoes]);
+  }
+
+  function removerNotificacao(id: number) {
+    setNotificacoes(notificacoes.filter((n) => n.id !== id));
+  }
+
+  const [transacoes, setTransacoes] = useState<Transacao[]>(() => {
+    const savedTransacoes = localStorage.getItem("transacoes");
+    return savedTransacoes ? JSON.parse(savedTransacoes) : [];
+  });
+  const [notificacao, setNotificacao] = useState<string | null>(null); // 👈
+
+  // Sempre que mudar transações, atualiza o localStorage
+  useEffect(() => {
+    localStorage.setItem("transacoes", JSON.stringify(transacoes));
+  }, [transacoes]);
+
+  // Sempre que mudar usuário, atualiza o localStorage
+  useEffect(() => {
+    if (user) localStorage.setItem("user", JSON.stringify(user));
+    else localStorage.removeItem("user");
+  }, [user]);
+
+  // Adiciona uma nova transação
+  function adicionarTransacao(transacao: Omit<Transacao, "id" | "data">) {
+    const novaTransacao: Transacao = {
+      ...transacao,
+      id: Date.now(),
+      data: new Date().toLocaleDateString(), // Apenas dia/mês/ano
+    };
+    setTransacoes([...transacoes, novaTransacao]);
+    adicionarNotificacao("Transação adicionada!", transacao.tipo);
+  }
+
+  // Remove uma transação pelo id
+  function removerTransacao(id: number) {
+    setTransacoes(transacoes.filter((t) => t.id !== id));
+  }
+
+  // Calcula receitas, despesas e saldo
+  const receitas = transacoes
+    .filter((t) => t.tipo === "entrada")
+    .reduce((acc, t) => acc + t.valor, 0);
+
+  const despesas = transacoes
+    .filter((t) => t.tipo === "saida")
+    .reduce((acc, t) => acc + t.valor, 0);
+
+  const saldo = receitas - despesas;
+
+  // Cadastro de usuário
   function signup(name: string, email: string, password: string): boolean {
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-    const exists = users.find((u: User) => u.email === email);
+    const users: User[] = JSON.parse(localStorage.getItem("users") || "[]");
+    const exists = users.find((u) => u.email === email);
     if (exists) return false;
+
     const initials = name
       .split(" ")
       .map((n) => n[0])
       .join("")
       .toUpperCase();
 
-    const newUsers: User = {
+    const newUser: User = {
       name,
       email,
       password,
-      avatar: `https://ui-avatars.com/api/?name=${initials}&background=random&rounded=true&size=128`, // gerador de avatar
+      avatar: `https://ui-avatars.com/api/?name=${initials}&background=random&rounded=true&size=128`,
     };
 
-    users.push(newUsers);
+    users.push(newUser);
     localStorage.setItem("users", JSON.stringify(users));
-    localStorage.setItem("user", JSON.stringify(newUsers));
+    setUser(newUser);
 
-    setUser(newUsers);
-    localStorage.setItem("user", JSON.stringify(newUsers));
     return true;
   }
 
+  // Login de usuário
   function login(email: string, password: string): boolean {
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const users: User[] = JSON.parse(localStorage.getItem("users") || "[]");
     const validUser = users.find(
-      (u: User & { password: string }) =>
-        u.email === email && u.password === password
+      (u) => u.email === email && u.password === password
     );
+
     if (validUser) {
       setUser(validUser);
-      localStorage.setItem("validUser", JSON.stringify(validUser));
       return true;
     }
     return false;
   }
 
+  // Logout
   function logout() {
     setUser(null);
-    localStorage.removeItem("user");
   }
-
-  const cards: CardsProps[] = [
-    {
-      id: 1,
-      title: "Saldo Actual",
-      value: "$500",
-      icon: <CurrencyDollar size={24} />,
-    },
-    {
-      id: 2,
-      title: "Receitas",
-      value: "$2000",
-      icon: <CurrencyDollar size={24} />,
-    },
-    {
-      id: 3,
-      title: "Despesas",
-      value: "$1200",
-      icon: <CurrencyDollar size={24} />,
-    },
-    {
-      id: 4,
-      title: "Transações",
-      value: 25,
-      icon: <ChartLine size={24} />,
-    },
-  ];
-
-  const historico: HistoricoTypes[] = [
-    {
-      id: 1,
-      descricao: "Salário",
-      valor: 2000,
-      tipo: "entrada",
-      data: format(new Date(), "dd/MM/yyyy HH:mm"),
-    },
-    {
-      id: 2,
-      descricao: "Supermercado",
-      valor: 350,
-      tipo: "saida",
-      data: format(new Date(), "dd/MM/yyyy HH:mm"),
-    },
-    {
-      id: 3,
-      descricao: "Energia elétrica",
-      valor: 120,
-      tipo: "saida",
-      data: format(new Date(), "dd/MM/yyyy HH:mm"),
-    },
-    {
-      id: 4,
-      descricao: "Venda de produto",
-      valor: 500,
-      tipo: "entrada",
-      data: format(new Date(), "dd/MM/yyyy HH:mm"),
-    },
-    {
-      id: 5,
-      descricao: "Venda de produto",
-      valor: 500,
-      tipo: "entrada",
-      data: format(new Date(), "dd/MM/yyyy HH:mm"),
-    },
-    {
-      id: 6,
-      descricao: "Venda de produto",
-      valor: 500,
-      tipo: "entrada",
-      data: format(new Date(), "dd/MM/yyyy HH:mm"),
-    },
-    {
-      id: 7,
-      descricao: "Venda de produto",
-      valor: 500,
-      tipo: "entrada",
-      data: format(new Date(), "dd/MM/yyyy HH:mm"),
-    },
-    {
-      id: 8,
-      descricao: "Venda de produto",
-      valor: 500,
-      tipo: "entrada",
-      data: format(new Date(), "dd/MM/yyyy HH:mm"),
-    },
-    {
-      id: 9,
-      descricao: "Venda de produto",
-      valor: 500,
-      tipo: "entrada",
-      data: format(new Date(), "dd/MM/yyyy HH:mm"),
-    },
-    {
-      id: 10,
-      descricao: "Venda de produto",
-      valor: 500,
-      tipo: "entrada",
-      data: format(new Date(), "dd/MM/yyyy HH:mm"),
-    },
-  ];
 
   return (
     <DashboardContext.Provider
-      value={{ cards, historico, user, signup, login, logout, setUser }}
+      value={{
+        user,
+        signup,
+        login,
+        logout,
+        setUser,
+        transacoes,
+        saldo,
+        receitas,
+        despesas,
+        adicionarTransacao,
+        removerTransacao,
+        notificacao,
+        notificacoes, // 👈 novo
+        setNotificacao,
+        adicionarNotificacao,
+        removerNotificacao, // 👈 novo
+      }}
     >
       {children}
     </DashboardContext.Provider>

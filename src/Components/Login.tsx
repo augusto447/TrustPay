@@ -61,7 +61,6 @@ export function Login() {
       navigate("/dashboard");
     } catch (error) {
       console.error("Erro no login Google:", error);
-      setMessage("Erro no login com Google!");
     }
   }
 

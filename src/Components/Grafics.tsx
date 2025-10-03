@@ -39,7 +39,7 @@ const saldoData = barData.map((item) => {
 
 export function Grafics() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-90">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-90 mt-6">
       <div className="bg-white shadow-md rounded-2xl p-4 w-80">
         <div className="flex items-center gap-2 mb-4">
           <ChartBar size={20} weight="duotone" className="text-gray-500" />
