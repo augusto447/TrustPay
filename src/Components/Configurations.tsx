@@ -1,4 +1,4 @@
-import { Bell, Moon, Sun, User } from "phosphor-react";
+import { Bell, Moon, Sun } from "phosphor-react";
 import { NavLink } from "react-router-dom";
 
 export function Configurations() {
@@ -31,13 +31,6 @@ export function Configurations() {
         </NavLink>
 
         {/* Perfil */}
-        <NavLink
-          to={"/profile"}
-          className="flex items-center gap-2 bg-white shadow p-3 md:p-4 rounded-2xl cursor-pointer w-full justify-center sm:justify-start"
-        >
-          <User size={28} className="text-green-500" />
-          <span>Perfil</span>
-        </NavLink>
       </div>
     </div>
   );

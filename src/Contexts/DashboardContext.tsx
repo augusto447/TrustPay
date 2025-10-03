@@ -26,7 +26,7 @@ interface Notificacao {
   tipo: "entrada" | "saida";
 }
 
-interface DasboardContextTypes {
+interface DashboardContextTypes {
   user: User | null;
   signup: (nome: string, email: string, password: string) => boolean;
   login: (email: string, password: string) => boolean;
@@ -46,7 +46,7 @@ interface DasboardContextTypes {
   removerNotificacao: (id: number) => void;
 }
 
-export const DashboardContext = createContext({} as DasboardContextTypes);
+export const DashboardContext = createContext({} as DashboardContextTypes);
 
 export function DashboardContextProvider({
   children,

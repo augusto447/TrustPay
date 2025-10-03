@@ -11,12 +11,12 @@ export function DefaultLayout() {
         <SideBar />
 
         <main className="bg-gray-300 w-screen">
-          
           <Outlet />
-          
         </main>
       </div>
-      <footer><Footer/></footer>
+      <footer>
+        <Footer />
+      </footer>
     </div>
   );
 }
