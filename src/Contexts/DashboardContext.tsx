@@ -39,7 +39,7 @@ interface DasboardContextTypes {
   adicionarTransacao: (transacao: Omit<Transacao, "id" | "data">) => void;
   removerTransacao: (id: number) => void;
 
-  notificacao: string | null; // 👈 nova
+  notificacao: string | null; // aviso temporário
   setNotificacao: (msg: string | null) => void;
   notificacoes: Notificacao[];
   adicionarNotificacao: (mensagem: string, tipo: "entrada" | "saida") => void;
@@ -51,61 +51,88 @@ export const DashboardContext = createContext({} as DasboardContextTypes);
 export function DashboardContextProvider({
   children,
 }: DasboardContextProviderProps) {
-  // Inicializa estados direto do localStorage
+  // Estado do usuário
   const [user, setUser] = useState<User | null>(() => {
     const savedUser = localStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  const [notificacoes, setNotificacoes] = useState<Notificacao[]>([]);
-
-  function adicionarNotificacao(mensagem: string, tipo: "entrada" | "saida") {
-    const novaNotificacao = {
-      id: Date.now(),
-      mensagem,
-      tipo,
-    };
-    setNotificacoes([novaNotificacao, ...notificacoes]);
-  }
-
-  function removerNotificacao(id: number) {
-    setNotificacoes(notificacoes.filter((n) => n.id !== id));
-  }
-
+  // Estado das transações
   const [transacoes, setTransacoes] = useState<Transacao[]>(() => {
-    const savedTransacoes = localStorage.getItem("transacoes");
-    return savedTransacoes ? JSON.parse(savedTransacoes) : [];
+    const saved = localStorage.getItem("transacoes");
+    return saved ? JSON.parse(saved) : [];
   });
-  const [notificacao, setNotificacao] = useState<string | null>(null); // 👈
 
-  // Sempre que mudar transações, atualiza o localStorage
+  // Estado das notificações
+  const [notificacoes, setNotificacoes] = useState<Notificacao[]>(() => {
+    const saved = localStorage.getItem("notificacoes");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Aviso temporário (topo)
+  const [notificacao, setNotificacao] = useState<string | null>(null);
+
+  // Persistir transações
   useEffect(() => {
     localStorage.setItem("transacoes", JSON.stringify(transacoes));
   }, [transacoes]);
 
-  // Sempre que mudar usuário, atualiza o localStorage
+  // Persistir notificações
+  useEffect(() => {
+    localStorage.setItem("notificacoes", JSON.stringify(notificacoes));
+  }, [notificacoes]);
+
+  // Persistir usuário
   useEffect(() => {
     if (user) localStorage.setItem("user", JSON.stringify(user));
     else localStorage.removeItem("user");
   }, [user]);
 
-  // Adiciona uma nova transação
+  // Adicionar notificação
+  function adicionarNotificacao(mensagem: string, tipo: "entrada" | "saida") {
+    const nova: Notificacao = { id: Date.now(), mensagem, tipo };
+    setNotificacoes([nova, ...notificacoes]);
+  }
+
+  // Remover notificação
+  function removerNotificacao(id: number) {
+    setNotificacoes(notificacoes.filter((n) => n.id !== id));
+  }
+
+  // Adicionar transação
   function adicionarTransacao(transacao: Omit<Transacao, "id" | "data">) {
-    const novaTransacao: Transacao = {
+    const nova: Transacao = {
       ...transacao,
       id: Date.now(),
-      data: new Date().toLocaleDateString(), // Apenas dia/mês/ano
+      data: new Date().toLocaleDateString(),
     };
-    setTransacoes([...transacoes, novaTransacao]);
-    adicionarNotificacao("Transação adicionada!", transacao.tipo);
+    setTransacoes([...transacoes, nova]);
+
+    // Notificações
+    setNotificacao("Transação adicionada!");
+    adicionarNotificacao(
+      `Nova ${transacao.tipo}: ${transacao.descricao}`,
+      transacao.tipo
+    );
+
+    setTimeout(() => setNotificacao(null), 3000); // some depois de 3s
   }
 
-  // Remove uma transação pelo id
+  // Remover transação
   function removerTransacao(id: number) {
-    setTransacoes(transacoes.filter((t) => t.id !== id));
+    const t = transacoes.find((t) => t.id === id);
+    if (!t) return;
+
+    setTransacoes(transacoes.filter((trans) => trans.id !== id));
+
+    // Notificações
+    setNotificacao("Transação removida!");
+    adicionarNotificacao(`Removida ${t.tipo}: ${t.descricao}`, t.tipo);
+
+    setTimeout(() => setNotificacao(null), 3000);
   }
 
-  // Calcula receitas, despesas e saldo
+  // Calcular saldo
   const receitas = transacoes
     .filter((t) => t.tipo === "entrada")
     .reduce((acc, t) => acc + t.valor, 0);
@@ -116,11 +143,10 @@ export function DashboardContextProvider({
 
   const saldo = receitas - despesas;
 
-  // Cadastro de usuário
+  // Cadastro
   function signup(name: string, email: string, password: string): boolean {
     const users: User[] = JSON.parse(localStorage.getItem("users") || "[]");
-    const exists = users.find((u) => u.email === email);
-    if (exists) return false;
+    if (users.find((u) => u.email === email)) return false;
 
     const initials = name
       .split(" ")
@@ -142,18 +168,14 @@ export function DashboardContextProvider({
     return true;
   }
 
-  // Login de usuário
+  // Login
   function login(email: string, password: string): boolean {
     const users: User[] = JSON.parse(localStorage.getItem("users") || "[]");
-    const validUser = users.find(
+    const valid = users.find(
       (u) => u.email === email && u.password === password
     );
-
-    if (validUser) {
-      setUser(validUser);
-      return true;
-    }
-    return false;
+    if (valid) setUser(valid);
+    return !!valid;
   }
 
   // Logout
@@ -176,10 +198,10 @@ export function DashboardContextProvider({
         adicionarTransacao,
         removerTransacao,
         notificacao,
-        notificacoes, // 👈 novo
         setNotificacao,
+        notificacoes,
         adicionarNotificacao,
-        removerNotificacao, // 👈 novo
+        removerNotificacao,
       }}
     >
       {children}

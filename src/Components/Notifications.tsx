@@ -19,8 +19,11 @@ export function Notifications() {
               n.tipo === "entrada" ? "bg-green-500" : "bg-red-500"
             }`}
           >
-            <span>{n.mensagem}</span>
-            <button onClick={() => removerNotificacao(n.id)}>
+            <span className="cursor-pointer">{n.mensagem}</span>
+            <button
+              className="cursor-pointer text-white p-1 rounded hover:bg-red-100 hover:text-red-500 transition-colors"
+              onClick={() => removerNotificacao(n.id)}
+            >
               <Trash size={16} />
             </button>
           </div>

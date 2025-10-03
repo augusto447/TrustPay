@@ -13,7 +13,7 @@ export function Cards() {
     useContext(DashboardContext);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-0.5">
       {/* Saldo Atual */}
       <div className="bg-white shadow p-6 rounded-2xl text-center">
         <h2 className="flex justify-center items-center gap-2 text-gray-500">
